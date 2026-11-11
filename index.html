@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shift Tech Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+/* One file, three views: start (enter code), phone (group places technologies), screen (live four-square). */
+:root{
+  --ground:#EEF2F1; --panel:#FFFFFF; --ink:#132B27; --muted:#526863; --line:#CFDBD8; --soft:#E3ECEA;
+  --accent:#0D776D; --on-accent:#FFFFFF; --accent-soft:#D6EBE7;
+  --q1:#1E8A4C; --q1-soft:#DDF1E4;   /* helps care, works well */
+  --q2:#C77A08; --q2-soft:#FBEDD3;   /* helps care, often fails */
+  --q3:#3F6FA8; --q3-soft:#E0E9F5;   /* adds work, works well */
+  --q4:#C0442D; --q4-soft:#F8E0DA;   /* adds work, often fails */
+  --shadow:0 1px 2px rgba(19,43,39,.08),0 10px 28px rgba(19,43,39,.08);
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0C1715; --panel:#132320; --ink:#E3EEEB; --muted:#9AB1AC; --line:#27403B; --soft:#1A2E2A;
+    --accent:#3EC2B2; --on-accent:#05201C; --accent-soft:#16332F;
+    --q1:#5FD08F; --q1-soft:#15321F; --q2:#F0B24A; --q2-soft:#382812; --q3:#8DB4EA; --q3-soft:#1A2638; --q4:#F08B73; --q4-soft:#3A1C16;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0C1715; --panel:#132320; --ink:#E3EEEB; --muted:#9AB1AC; --line:#27403B; --soft:#1A2E2A;
+  --accent:#3EC2B2; --on-accent:#05201C; --accent-soft:#16332F;
+  --q1:#5FD08F; --q1-soft:#15321F; --q2:#F0B24A; --q2-soft:#382812; --q3:#8DB4EA; --q3-soft:#1A2638; --q4:#F08B73; --q4-soft:#3A1C16;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.eyebrow{margin:0;text-transform:uppercase;letter-spacing:.12em;font-size:.78rem;font-weight:700;color:var(--muted)}
+.btn{border:0;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:10px 18px;font-weight:700;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:default;filter:none}
+.ghost{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 13px;cursor:pointer;font-weight:700}
+.ghost:hover{border-color:var(--accent)}
+.ghost[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.danger{color:var(--q4);border-color:var(--q4)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:10px 18px;border-radius:12px;font-weight:700;z-index:30;max-width:calc(100% - 32px);text-align:center}
+
+/* ---------------- start view ---------------- */
+.start{min-height:100%;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.start-card{width:min(420px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.start-card h1{margin:0;font-family:var(--display);font-size:2rem;line-height:1.05;letter-spacing:-.02em}
+.start-card input{font-family:var(--display);font-weight:800;font-size:2rem;letter-spacing:.2em;text-transform:uppercase;text-align:center;padding:12px;border:2px solid var(--line);border-radius:14px;background:var(--ground);width:100%}
+.start-card input:focus{outline:none;border-color:var(--accent)}
+.small-link{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;font-size:.9rem;align-self:center}
+
+/* ---------------- phone view ---------------- */
+.phone{max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:14px;padding:14px max(16px,env(safe-area-inset-right,0px)) calc(96px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.p-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.p-head h1{margin:0;font-family:var(--display);font-size:1.6rem;line-height:1;letter-spacing:-.02em}
+.p-group{font-family:var(--display);font-weight:800;font-size:1rem;background:var(--accent-soft);color:var(--accent);border:0;border-radius:99px;padding:6px 12px;cursor:pointer}
+.step{margin:0;font-family:var(--display);font-weight:800;font-size:1.1rem}
+.step span{display:inline-grid;place-items:center;width:1.6em;height:1.6em;border-radius:50%;background:var(--ink);color:var(--ground);font-size:.85em;margin-right:6px}
+.groups{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.groups button{aspect-ratio:1;border:1px solid var(--line);background:var(--panel);border-radius:14px;font-family:var(--display);font-weight:800;font-size:1.4rem;cursor:pointer}
+.groups button:hover{border-color:var(--accent)}
+.techs{display:flex;flex-wrap:wrap;gap:8px}
+.techs{gap:6px}
+.techs button{border:1px solid var(--line);background:var(--panel);border-radius:99px;padding:6px 11px;font-weight:700;cursor:pointer;font-size:.92rem}
+.techs button[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.techs button.placed{opacity:.45;text-decoration:line-through}
+.other{display:flex;gap:8px}
+.other input{flex:1;min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 12px}
+.pad-wrap{display:grid;grid-template-columns:22px minmax(0,1fr);grid-template-rows:auto auto;gap:6px}
+.pad-y{grid-row:1;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;color:var(--muted)}
+.pad-x{grid-column:2;display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;color:var(--muted)}
+.pad{position:relative;aspect-ratio:1;max-width:100%;border-radius:16px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;touch-action:none;user-select:none;-webkit-user-select:none;border:2px solid var(--line)}
+.pad.armed{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.pad .qq{padding:8px 10px;font-size:.78rem;font-weight:700;line-height:1.2;display:flex;flex-direction:column}
+.pad .qq b{font-family:var(--display);font-size:1.6rem;line-height:1;opacity:.35}
+.qq.s3{background:var(--q3-soft);color:var(--q3)} .qq.s1{background:var(--q1-soft);color:var(--q1);text-align:right;align-items:flex-end}
+.qq.s4{background:var(--q4-soft);color:var(--q4);justify-content:flex-end} .qq.s2{background:var(--q2-soft);color:var(--q2);text-align:right;align-items:flex-end;justify-content:flex-end}
+.pad::before,.pad::after{content:"";position:absolute;background:var(--muted);opacity:.6;pointer-events:none}
+.pad::before{left:50%;top:0;bottom:0;width:2px;transform:translateX(-1px)}
+.pad::after{top:50%;left:0;right:0;height:2px;transform:translateY(-1px)}
+.pad-hint{position:absolute;inset:auto 10px 50% 10px;transform:translateY(50%);text-align:center;font-weight:700;background:var(--panel);border-radius:12px;padding:8px 10px;box-shadow:var(--shadow);pointer-events:none;z-index:2}
+.dot{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;z-index:3;touch-action:none;cursor:grab}
+.dot i{width:22px;height:22px;border-radius:50%;border:3px solid var(--panel);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.dot span{font-size:.75rem;font-weight:700;background:var(--panel);border-radius:6px;padding:0 5px;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis}
+.dot.sel i{outline:3px solid var(--ink);outline-offset:1px}
+.placed-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.placed-list li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.placed-list li i{width:14px;height:14px;border-radius:50%}
+.placed-list .nm{font-weight:700;overflow-wrap:anywhere}
+.placed-list .nm small{display:block;font-weight:400;color:var(--muted)}
+.star{border:1px solid var(--line);background:var(--panel);border-radius:99px;padding:5px 10px;font-weight:700;cursor:pointer;font-size:.85rem;white-space:nowrap}
+.star[aria-pressed="true"]{background:var(--q4);border-color:var(--q4);color:#fff}
+.x{border:0;background:none;font-size:1.3rem;line-height:1;cursor:pointer;color:var(--muted);padding:4px 6px}
+.empty-note{margin:0;color:var(--muted);font-size:.95rem}
+.sendbar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));z-index:5}
+.sendbar-in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.sendbar .btn{flex:1;font-size:1.15rem;padding:14px}
+.send-state{font-weight:700;font-size:.9rem;color:var(--muted);min-width:7em;text-align:right}
+.send-state.ok{color:var(--q1)} .send-state.bad{color:var(--q4)}
+
+/* ---------------- screen view ---------------- */
+.screen{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr);padding-inline:max(16px,clamp(16px,2.6vw,40px))}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px;padding-block:12px 10px;border-bottom:1px solid var(--line)}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand h1{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,2.6vw,2.4rem);letter-spacing:-.03em;line-height:1}
+.top-right{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.stat{display:flex;flex-direction:column}
+.stat b{font-family:var(--display);font-weight:800;font-size:clamp(1.4rem,2.2vw,2rem);line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--muted)}
+.room{font-family:var(--display);font-weight:800;font-size:clamp(1.4rem,2.2vw,2rem);letter-spacing:.12em;line-height:1}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;font-weight:700;font-size:.9rem;background:var(--soft);color:var(--muted)}
+.pill i{width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.pill.live{background:var(--q1-soft);color:var(--q1)} .pill.live i{background:var(--q1);animation:pulse 1.6s ease-in-out infinite}
+.pill.err{background:var(--q4-soft);color:var(--q4)} .pill.err i{background:var(--q4)}
+.pill.demo{background:var(--q2-soft);color:var(--q2)} .pill.demo i{background:var(--q2)}
+@keyframes pulse{50%{opacity:.3}}
+.main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:clamp(14px,2.4vw,32px);min-height:0;padding-block:clamp(12px,2vh,22px)}
+@media (max-width:980px){.main{grid-template-columns:1fr}.screen{height:auto;min-height:100%}}
+.board-wrap{min-height:0;min-width:0;display:flex;align-items:center;justify-content:center}
+svg#board{width:100%;height:100%;max-height:calc(100vh - 140px);display:block}
+@media (max-width:980px){svg#board{height:auto;max-height:none}}
+.side{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto;padding-right:4px}
+.sq{border-radius:16px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.sq-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sq-head b{font-family:var(--display);font-size:1.1rem;line-height:1.15}
+.sq-head span{font-family:var(--display);font-weight:800;font-size:1.4rem;font-variant-numeric:tabular-nums}
+.sq-sub{margin:0;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:0;padding:3px 10px;border-radius:99px;font-weight:700;font-size:.92rem;background:var(--soft);cursor:pointer}
+.chips em{font-style:normal;color:var(--muted);margin-left:4px;font-variant-numeric:tabular-nums}
+.sq.s1{box-shadow:inset 5px 0 0 var(--q1)} .sq.s1 .sq-sub,.sq.s1 .sq-head span{color:var(--q1)} .sq.s1 .chips button{background:var(--q1-soft)}
+.sq.s2{box-shadow:inset 5px 0 0 var(--q2)} .sq.s2 .sq-sub,.sq.s2 .sq-head span{color:var(--q2)} .sq.s2 .chips button{background:var(--q2-soft)}
+.sq.s3{box-shadow:inset 5px 0 0 var(--q3)} .sq.s3 .sq-sub,.sq.s3 .sq-head span{color:var(--q3)} .sq.s3 .chips button{background:var(--q3-soft)}
+.sq.s4{box-shadow:inset 5px 0 0 var(--q4)} .sq.s4 .sq-sub,.sq.s4 .sq-head span{color:var(--q4)} .sq.s4 .chips button{background:var(--q4-soft)}
+.worry{border-radius:16px;padding:12px 14px;background:var(--q4-soft);display:flex;flex-direction:column;gap:6px}
+.worry p{margin:0}
+.worry .eyebrow{color:var(--q4)}
+.worry ol{margin:0;padding-left:1.3em;font-weight:700;font-size:1.05rem}
+.worry ol em{font-style:normal;color:var(--muted);font-weight:400}
+.hidden-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
+.ax{font-family:var(--body);font-weight:700;fill:var(--muted);font-size:15px}
+.ax-strong{font-family:var(--display);font-weight:800;font-size:19px;fill:var(--ink)}
+.qlabel{font-family:var(--display);font-weight:800;font-size:17px}
+.qnum{font-family:var(--display);font-weight:800;font-size:60px;opacity:.13}
+.blabel{font-family:var(--body);font-weight:700;font-size:15px;fill:var(--ink);paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+.bcount{font-family:var(--display);font-weight:800;font-size:14px;fill:#fff}
+.bub.new circle.main{animation:pop .6s ease-out}
+.bub circle.main{transform-box:fill-box;transform-origin:center}
+@keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.overlay{position:fixed;inset:0;background:rgba(6,20,18,.62);display:grid;place-items:center;padding:16px;z-index:10}
+.sheet{background:var(--panel);color:var(--ink);border-radius:22px;padding:clamp(18px,3vw,34px);width:min(680px,100%);display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow);max-height:100%;overflow:auto}
+.qr-sheet{align-items:center;text-align:center}
+#qrBox{background:#fff;padding:16px;border-radius:16px;line-height:0}
+#qrBox img,#qrBox canvas{width:min(48vh,400px)!important;height:auto!important}
+.qr-code{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,6vw,4rem);letter-spacing:.18em;margin:0;line-height:1}
+.qr-link{margin:0;color:var(--muted);font-weight:700;overflow-wrap:anywhere}
+.warn{margin:0;padding:10px 14px;border-radius:12px;background:var(--q2-soft);color:var(--ink);font-weight:700;text-align:left}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:700}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- START: student types the room code -->
+<div id="vStart" class="start" hidden>
+  <form id="startForm" class="start-card">
+    <p class="eyebrow">NURA 4311 · Shift tech audit</p>
+    <h1>Enter the code on the screen</h1>
+    <label for="codeIn" class="eyebrow">Room code</label>
+    <input id="codeIn" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123">
+    <button class="btn" type="submit">Join</button>
+    <button id="toScreen" class="small-link" type="button">Lecturer: open the class screen</button>
+  </form>
+</div>
+
+<!-- PHONE: one phone per group -->
+<div id="vPhone" class="phone" hidden>
+  <div class="p-head">
+    <div><p class="eyebrow" id="pRoom">Room</p><h1>Shift tech audit</h1></div>
+    <button id="pGroup" class="p-group" type="button" hidden>Group –</button>
+  </div>
+
+  <section id="pickGroup">
+    <p class="step"><span>1</span>Which group are you?</p>
+    <div class="groups" id="groupBtns" style="margin-top:10px"></div>
+  </section>
+
+  <section id="work" hidden style="display:flex;flex-direction:column;gap:14px">
+    <div>
+      <p class="step"><span>1</span>Pick a technology you used</p>
+      <div class="techs" id="techBtns" style="margin-top:10px"></div>
+      <form class="other" id="otherForm" style="margin-top:8px">
+        <label for="otherIn" class="eyebrow" hidden>Other technology</label>
+        <input id="otherIn" maxlength="32" placeholder="Something else? Type it" autocomplete="off">
+        <button class="ghost" type="submit">Add</button>
+      </form>
+    </div>
+    <div>
+      <p class="step"><span>2</span>Tap where it goes</p>
+      <p class="empty-note" style="margin-top:4px">Right = helps care. Up = works well. Drag a dot to move it.</p>
+      <div class="pad-wrap" style="margin-top:8px">
+        <div class="pad-y"><span>Often fails</span><span>Works well</span></div>
+        <div class="pad" id="pad">
+          <div class="qq s3"><b>3</b>Adds work, works well</div>
+          <div class="qq s1"><b>1</b>Helps care, works well</div>
+          <div class="qq s4">Adds work, often fails<b>4</b></div>
+          <div class="qq s2">Helps care, often fails<b>2</b></div>
+          <p class="pad-hint" id="padHint">Pick a technology first</p>
+        </div>
+        <div class="pad-x"><span>← Adds work</span><span>Helps care →</span></div>
+      </div>
+    </div>
+    <div>
+      <p class="step"><span>3</span>Star the one that worries you most</p>
+      <ul class="placed-list" id="placedList" style="margin-top:10px"></ul>
+      <p class="empty-note" id="placedEmpty" style="margin-top:8px">Nothing placed yet.</p>
+    </div>
+  </section>
+</div>
+<div id="sendbar" class="sendbar" hidden>
+  <div class="sendbar-in">
+    <button id="sendBtn" class="btn" type="button" disabled>Send to the screen</button>
+    <span id="sendState" class="send-state"></span>
+  </div>
+</div>
+
+<!-- SCREEN: lecturer's laptop -->
+<div id="vScreen" class="screen" hidden>
+  <header class="top">
+    <div class="brand">
+      <p class="eyebrow">NURA 4311 · Slide 5 · Group activity</p>
+      <h1>Shift tech audit</h1>
+    </div>
+    <div class="top-right">
+      <span id="status" class="pill"><i></i><span id="statusText">Connecting</span></span>
+      <div class="stat"><b class="room" id="roomCode">––––––</b><span>Room code</span></div>
+      <div class="stat"><b id="stGroups">0</b><span>Groups</span></div>
+      <div class="stat"><b id="stTech">0</b><span>Technologies</span></div>
+      <button id="qrBtn" class="btn" type="button">Show QR</button>
+      <button id="dotsBtn" class="ghost" type="button" aria-pressed="false">Show every answer</button>
+      <button id="moreBtn" class="ghost" type="button">More</button>
+    </div>
+  </header>
+  <p id="connWarn" class="warn" style="margin-top:10px" hidden></p>
+  <div class="main">
+    <div class="board-wrap"><svg id="board" viewBox="0 0 1000 760" role="img" aria-label="Four-square chart of technologies"></svg></div>
+    <aside class="side" id="side" aria-label="What is in each square"></aside>
+  </div>
+</div>
+
+<div id="qr" class="overlay" hidden>
+  <div class="sheet qr-sheet" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <p class="eyebrow">One phone per group</p>
+    <h2 id="qrTitle" style="margin:0;font-family:var(--display);font-size:clamp(1.5rem,3vw,2.2rem)">Scan to join</h2>
+    <div id="qrBox"></div>
+    <p class="eyebrow">or open the link and type the code</p>
+    <p class="qr-code" id="qrCode"></p>
+    <p class="qr-link" id="qrLink"></p>
+    <p class="warn" id="qrWarn" hidden>This page is open from a file on your laptop, so phones can’t reach it. Put it online first (see the setup steps), then open it from that web address.</p>
+    <button id="qrClose" class="btn" type="button">Back to the board</button>
+  </div>
+</div>
+
+<div id="more" class="overlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="moreTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h2 id="moreTitle" style="margin:0;font-family:var(--display);font-size:1.6rem">Board options</h2>
+      <button id="moreClose" class="ghost" type="button">Close</button>
+    </div>
+    <div class="confirm" id="newRoomRow">
+      <button id="newRoomBtn" class="ghost danger" type="button">New room (clear the board)</button>
+      <span class="empty-note">Use at the start of each class. Phones on the old code stop counting.</span>
+    </div>
+    <div class="confirm" id="newRoomAsk" hidden>
+      <span>Clear the board and make a new code?</span>
+      <button id="newRoomYes" class="ghost danger" type="button">Yes, new room</button>
+      <button id="newRoomNo" class="ghost" type="button">Cancel</button>
+    </div>
+    <div class="confirm">
+      <button id="demoBtn" class="ghost" type="button">Fill with sample data</button>
+      <span class="empty-note">To try the board before class. Sample answers stay on this laptop only.</span>
+    </div>
+    <div class="confirm">
+      <button id="fsBtn" class="ghost" type="button">Full screen</button>
+      <button id="unhideBtn" class="ghost" type="button">Show hidden items again</button>
+    </div>
+    <p class="empty-note">Click any item in the side panel to hide it from the board (for joke or duplicate answers).</p>
+  </div>
+</div>
+<p id="toast" class="toast" role="status" hidden></p>
+
+<script>
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+const RELAY = 'https://ntfy.sh/';          // free public relay; the room code makes the channel private enough for this
+const PREFIX = 'nura4311-sta-';
+const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const TECHS = ['Cardiac monitor','Pulse oximeter','Digital thermometer','BP machine','Glucometer','Infusion pump','Barcode scanner',
+  'Ward computer (EMR)','Phone / WhatsApp','Call bell','Printer','Electric bed','Suction machine','Nebuliser'];
+const SQ = {
+  1:{name:'Helps care and works well', cls:'s1', v:'--q1'},
+  2:{name:'Helps care but often fails', cls:'s2', v:'--q2'},
+  3:{name:'Adds work but works well', cls:'s3', v:'--q3'},
+  4:{name:'Adds work and often fails', cls:'s4', v:'--q4'}
+};
+const squareOf = (x, y) => x >= 3 ? (y >= 3 ? 1 : 2) : (y >= 3 ? 3 : 4);
+const cssv = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const ls = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+let toastT = null;
+function toast(m){ const t = $('#toast'); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3200); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+const cleanCode = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+const newCode = () => Array.from({length:6}, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join('');
+const baseUrl = () => location.href.split('#')[0].split('?')[0];
+
+/* ---------------- routing ---------------- */
+const params = new URLSearchParams(location.search);
+const qRoom = cleanCode(params.get('room'));
+if (params.has('screen')) startScreen();
+else if (qRoom.length === 6) startPhone(qRoom);
+else showStart();
+
+function showStart(){
+  $('#vStart').hidden = false;
+  $('#startForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const c = cleanCode($('#codeIn').value);
+    if (c.length !== 6){ toast('The code has 6 letters and numbers.'); return; }
+    location.search = '?room=' + c;
+  });
+  $('#toScreen').addEventListener('click', () => { location.search = '?screen'; });
+}
+
+/* =====================================================================
+   PHONE
+   ===================================================================== */
+function startPhone(room){
+  $('#vPhone').hidden = false; $('#sendbar').hidden = false;
+  $('#pRoom').textContent = 'Room ' + room;
+  const KEY = 'sta-phone-' + room;
+  let device = ls.get('sta-device', null);
+  if (!device){ device = Math.random().toString(36).slice(2, 10); ls.set('sta-device', device); }
+  let P = Object.assign({group:0, items:[], sentSig:''}, ls.get(KEY, {}));
+  let pending = null;     // technology waiting to be placed
+  let selected = null;    // index of selected dot
+  const save = () => ls.set(KEY, P);
+  const sig = () => JSON.stringify([P.group, P.items.map(i => [i.t, i.x, i.y, !!i.w])]);
+
+  // groups
+  const gb = $('#groupBtns');
+  for (let g = 1; g <= 20; g++){
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = g; b.setAttribute('aria-label', 'Group ' + g);
+    b.addEventListener('click', () => { P.group = g; save(); paint(); });
+    gb.appendChild(b);
+  }
+  $('#pGroup').addEventListener('click', () => { P.group = 0; save(); paint(); });
+
+  // technologies
+  function drawTechs(){
+    const box = $('#techBtns'); box.textContent = '';
+    const placed = {}; P.items.forEach(i => { placed[i.t.toLowerCase()] = true; });
+    TECHS.forEach(t => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = t;
+      b.setAttribute('aria-pressed', String(pending === t));
+      if (placed[t.toLowerCase()]) b.className = 'placed';
+      b.addEventListener('click', () => {
+        if (placed[t.toLowerCase()]){ selected = P.items.findIndex(i => i.t.toLowerCase() === t.toLowerCase()); pending = null; paint(); toast('Already placed. Drag its dot to move it.'); return; }
+        pending = pending === t ? null : t; selected = null; paint();
+        if (pending) showPad();
+      });
+      box.appendChild(b);
+    });
+  }
+  $('#otherForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const t = $('#otherIn').value.replace(/\s+/g, ' ').trim().slice(0, 32);
+    if (!t) return;
+    if (P.items.some(i => i.t.toLowerCase() === t.toLowerCase())){ toast('Already placed.'); return; }
+    pending = t; selected = null; $('#otherIn').value = ''; $('#otherIn').blur(); paint(); showPad();
+  });
+  function showPad(){
+    const smooth = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const r = $('#pad').getBoundingClientRect();
+    if (r.top < 0 || r.bottom > innerHeight - 80) $('#pad').scrollIntoView({behavior: smooth ? 'smooth' : 'auto', block: 'center'});
+  }
+
+  // pad
+  const pad = $('#pad');
+  const toXY = ev => {
+    const r = pad.getBoundingClientRect();
+    const fx = Math.min(1, Math.max(0, (ev.clientX - r.left) / r.width)), fy = Math.min(1, Math.max(0, (ev.clientY - r.top) / r.height));
+    return {x: Math.round((1 + fx * 4) * 10) / 10, y: Math.round((5 - fy * 4) * 10) / 10};
+  };
+  let drag = null;
+  pad.addEventListener('pointerdown', ev => {
+    const dot = ev.target.closest('.dot');
+    if (dot){
+      const idx = +dot.dataset.i; selected = idx; pending = null;
+      drag = {idx, id: ev.pointerId}; pad.setPointerCapture(ev.pointerId); ev.preventDefault(); paintPad(); paintList(); return;
+    }
+    if (pending){
+      const p = toXY(ev);
+      P.items.push({t: pending, x: p.x, y: p.y, w: false});
+      selected = P.items.length - 1; pending = null; save(); paint();
+    } else if (!P.items.length) toast('Pick a technology first.');
+    else { selected = null; paintPad(); paintList(); }
+  });
+  pad.addEventListener('pointermove', ev => {
+    if (!drag || ev.pointerId !== drag.id) return;
+    const p = toXY(ev); const it = P.items[drag.idx]; it.x = p.x; it.y = p.y; paintPad();
+  });
+  const endDrag = ev => { if (drag && ev.pointerId === drag.id){ drag = null; save(); paint(); } };
+  pad.addEventListener('pointerup', endDrag); pad.addEventListener('pointercancel', endDrag);
+
+  function paintPad(){
+    pad.querySelectorAll('.dot').forEach(d => d.remove());
+    pad.classList.toggle('armed', !!pending);
+    const hint = $('#padHint');
+    hint.hidden = !pending && P.items.length > 0;
+    hint.textContent = pending ? 'Tap where “' + pending + '” goes' : 'Pick a technology first';
+    P.items.forEach((it, i) => {
+      const d = document.createElement('div'); d.className = 'dot' + (i === selected ? ' sel' : ''); d.dataset.i = i;
+      d.style.left = ((it.x - 1) / 4 * 100) + '%'; d.style.top = ((5 - it.y) / 4 * 100) + '%';
+      const c = document.createElement('i'); c.style.background = cssv(SQ[squareOf(it.x, it.y)].v);
+      const s = document.createElement('span'); s.textContent = (it.w ? '★ ' : '') + it.t;
+      d.append(c, s); pad.appendChild(d);
+    });
+  }
+  function paintList(){
+    const ul = $('#placedList'); ul.textContent = '';
+    $('#placedEmpty').hidden = P.items.length > 0;
+    P.items.forEach((it, i) => {
+      const li = document.createElement('li');
+      const q = squareOf(it.x, it.y);
+      const c = document.createElement('i'); c.style.background = cssv(SQ[q].v);
+      const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = it.t;
+      const sm = document.createElement('small'); sm.textContent = 'Square ' + q + ': ' + SQ[q].name; nm.appendChild(sm);
+      const st = document.createElement('button'); st.type = 'button'; st.className = 'star'; st.textContent = it.w ? '★ Worry' : '☆ Worry';
+      st.setAttribute('aria-pressed', String(!!it.w)); st.setAttribute('aria-label', 'Mark ' + it.t + ' as the one that worries you most');
+      st.addEventListener('click', () => { const on = !it.w; P.items.forEach(x => { x.w = false; }); it.w = on; save(); paint(); });
+      const x = document.createElement('button'); x.type = 'button'; x.className = 'x'; x.textContent = '×'; x.setAttribute('aria-label', 'Remove ' + it.t);
+      x.addEventListener('click', () => { P.items.splice(i, 1); selected = null; save(); paint(); });
+      li.append(c, nm, st, x); ul.appendChild(li);
+    });
+  }
+  function paintSend(){
+    const changed = sig() !== P.sentSig;
+    const b = $('#sendBtn'), s = $('#sendState');
+    b.disabled = !P.group || !P.items.length || sending || !changed;
+    b.textContent = P.sentSig && changed ? 'Send update' : 'Send to the screen';
+    if (sending){ s.className = 'send-state'; s.textContent = 'Sending…'; }
+    else if (sendErr){ s.className = 'send-state bad'; s.textContent = sendErr; }
+    else if (P.sentSig && !changed){ s.className = 'send-state ok'; s.textContent = 'On the screen ✓'; }
+    else if (P.sentSig){ s.className = 'send-state'; s.textContent = 'Not sent yet'; }
+    else { s.className = 'send-state'; s.textContent = ''; }
+  }
+  function paint(){
+    const hasG = !!P.group;
+    $('#pickGroup').hidden = hasG; $('#work').hidden = !hasG; $('#pGroup').hidden = !hasG;
+    $('#pGroup').textContent = 'Group ' + P.group + ' · change';
+    if (hasG){ drawTechs(); paintPad(); paintList(); }
+    paintSend();
+  }
+
+  // sending (whole group state each time, so the screen always shows the latest)
+  let sending = false, sendErr = '';
+  $('#sendBtn').addEventListener('click', send);
+  async function send(){
+    if (sending) return;
+    sending = true; sendErr = ''; paintSend();
+    const s = sig();
+    const msg = {v:1, d:device, g:P.group, ts:Date.now(), items:P.items.map(i => ({t:i.t, x:i.x, y:i.y, w:!!i.w}))};
+    try {
+      const r = await fetch(RELAY + PREFIX + room, {method:'POST', body: JSON.stringify(msg)});
+      if (r.status === 429){ sendErr = 'Busy. Try again in 10 s'; }
+      else if (r.type === 'opaque'){ sendErr = 'Blocked here'; }
+      else if (!r.ok){ sendErr = 'Didn’t send. Try again'; }
+      else { P.sentSig = s; save(); toast('Sent. Check the big screen.'); }
+    } catch(e){ sendErr = 'No connection. Try again'; }
+    sending = false; paintSend();
+  }
+  paint();
+}
+
+/* =====================================================================
+   SCREEN
+   ===================================================================== */
+function startScreen(){
+  $('#vScreen').hidden = false;
+  let room = ls.get('sta-screen-room', '');
+  if (cleanCode(room).length !== 6){ room = newCode(); ls.set('sta-screen-room', room); }
+  let hidden = ls.get('sta-hidden-' + room, {});
+  let dots = ls.get('sta-dots', false);
+  let latest = {};      // device -> message
+  let demo = false;
+  let seen = {};
+  let es = null, gotOpen = false;
+
+  function paintRoom(){ $('#roomCode').textContent = room; }
+  function setStatus(kind, text){ const s = $('#status'); s.className = 'pill ' + kind; $('#statusText').textContent = text; }
+
+  /* ---- receive ---- */
+  function accept(raw){
+    let m; try { m = JSON.parse(raw); } catch(e){ return; }
+    if (!m || m.v !== 1 || typeof m.d !== 'string' || !Array.isArray(m.items)) return;
+    const g = Math.round(+m.g); if (!(g >= 1 && g <= 40)) return;
+    const items = m.items.slice(0, 25).map(i => ({
+      t: String(i && i.t || '').replace(/\s+/g, ' ').trim().slice(0, 32),
+      x: Math.min(5, Math.max(1, +i.x || 3)), y: Math.min(5, Math.max(1, +i.y || 3)), w: !!(i && i.w)
+    })).filter(i => i.t);
+    const d = m.d.slice(0, 16), ts = +m.ts || 0;
+    if (latest[d] && latest[d].ts >= ts) return;
+    latest[d] = {g, ts, items};
+    draw();
+  }
+  /* Live stream first; if it keeps failing, check for new answers every 4 s instead; if both fail, say why. */
+  let fails = 0, pollIv = null, connGen = 0;
+  function blockedHere(){
+    let framed = false; try { framed = window.top !== window.self; } catch(e){ framed = true; }
+    return location.protocol === 'file:' || /claude|anthropic/i.test(location.hostname) || framed;
+  }
+  function showProblem(){
+    const b = $('#connWarn');
+    b.innerHTML = blockedHere()
+      ? '<b>This copy can’t receive phone answers.</b> Claude links and files opened from your laptop are not allowed to reach the relay. Open your Netlify address with <b>?screen</b> at the end, e.g. <b>nura4311-tech.netlify.app/?screen</b>.'
+      : '<b>Can’t reach the relay (ntfy.sh).</b> Check the internet. Some campus networks block it: open <b>ntfy.sh</b> in a new tab to test, or connect this laptop to your phone’s hotspot.';
+    b.hidden = demo;
+  }
+  function connect(){
+    const gen = ++connGen;
+    if (es){ es.close(); es = null; }
+    clearInterval(pollIv); pollIv = null; fails = 0; gotOpen = false;
+    $('#connWarn').hidden = true;
+    setStatus('', 'Connecting');
+    try { es = new EventSource(RELAY + PREFIX + room + '/sse?since=all'); }
+    catch(e){ startPolling(gen); return; }
+    es.onopen = () => { if (gen !== connGen) return; gotOpen = true; fails = 0; $('#connWarn').hidden = true; if (!demo) setStatus('live', 'Live'); };
+    es.onmessage = ev => {
+      let e; try { e = JSON.parse(ev.data); } catch(x){ return; }
+      if (e && e.event === 'message' && typeof e.message === 'string') accept(e.message);
+    };
+    es.onerror = () => {
+      if (gen !== connGen) return;
+      fails++;
+      if (!gotOpen && fails >= 2){ es.close(); es = null; startPolling(gen); return; }
+      if (!demo) setStatus('err', navigator.onLine === false ? 'Offline' : 'Reconnecting…');
+    };
+  }
+  function startPolling(gen){
+    let pf = 0;
+    const tick = async () => {
+      if (gen !== connGen) return;
+      try {
+        const r = await fetch(RELAY + PREFIX + room + '/json?poll=1&since=all', {cache: 'no-store'});
+        if (!r.ok) throw new Error('status ' + r.status);
+        const txt = await r.text();
+        txt.split('\n').forEach(line => { if (!line.trim()) return; try { const e = JSON.parse(line); if (e.event === 'message' && typeof e.message === 'string') accept(e.message); } catch(x){} });
+        pf = 0; $('#connWarn').hidden = true; if (!demo) setStatus('live', 'Live · checks every 4 s');
+      } catch(e){
+        pf++;
+        if (!demo){ setStatus('err', 'Can’t connect'); if (pf >= 1) showProblem(); }
+      }
+    };
+    tick(); pollIv = setInterval(tick, 4000);
+  }
+
+  /* ---- aggregate ---- */
+  const keyOf = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  function aggregate(){
+    const by = {}, groups = {}, worries = {};
+    Object.values(latest).forEach(m => {
+      groups[m.g] = true;
+      m.items.forEach(i => {
+        const k = keyOf(i.t); if (!k || hidden[k]) return;
+        const a = by[k] || (by[k] = {k, name: i.t, n:0, sx:0, sy:0, pts:[]});
+        a.n++; a.sx += i.x; a.sy += i.y; a.pts.push(i);
+        if (i.w) worries[k] = (worries[k] || 0) + 1;
+      });
+    });
+    const items = Object.values(by).map(a => { a.x = a.sx / a.n; a.y = a.sy / a.n; a.sq = squareOf(a.x, a.y); a.worry = worries[a.k] || 0; return a; });
+    return {items, groups: Object.keys(groups).length};
+  }
+
+  /* ---- draw ---- */
+  const NS = 'http://www.w3.org/2000/svg';
+  const B = {x0:110, y0:60, w:840, h:600};
+  const px = x => B.x0 + (x - 1) / 4 * B.w;
+  const py = y => B.y0 + (5 - y) / 4 * B.h;
+  function el(tag, attrs, parent){ const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+
+  function layout(items){
+    const maxN = Math.max(1, ...items.map(a => a.n));
+    const P = items.map(a => ({a, x: px(a.x), y: py(a.y), r: 16 + 22 * Math.sqrt(a.n / maxN)}));
+    const half = p => Math.max(p.r, p.a.name.length * 4.3) + 6;
+    const BAND = 46;
+    const clamp = p => {
+      const right = p.a.x >= 3, top = p.a.y >= 3, hw = half(p);
+      const xmin = right ? B.x0 + B.w / 2 + hw : B.x0 + hw, xmax = right ? B.x0 + B.w - hw : B.x0 + B.w / 2 - hw;
+      const ymin = top ? B.y0 + BAND + p.r : B.y0 + B.h / 2 + p.r + 8, ymax = top ? B.y0 + B.h / 2 - p.r - 28 : B.y0 + B.h - BAND - p.r - 22;
+      p.x = xmax < xmin ? (xmin + xmax) / 2 : Math.min(xmax, Math.max(xmin, p.x));
+      p.y = ymax < ymin ? (ymin + ymax) / 2 : Math.min(ymax, Math.max(ymin, p.y));
+    };
+    P.forEach(clamp);
+    for (let it = 0; it < 140; it++){
+      let moved = false;
+      for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++){
+        const p = P[i], q = P[j];
+        let dx = q.x - p.x, dy = q.y - p.y;
+        if (Math.abs(dx) < half(p) + half(q) && Math.abs(dy) < p.r + q.r + 24){
+          if (dx === 0 && dy === 0){ dx = (i % 2 ? 1 : -1); dy = 1; }
+          const d = Math.hypot(dx, dy) || 1;
+          p.x -= dx / d * 3; p.y -= dy / d * 3; q.x += dx / d * 3; q.y += dy / d * 3;
+          clamp(p); clamp(q); moved = true;
+        }
+      }
+      if (!moved) break;
+    }
+    return P;
+  }
+
+  function draw(){
+    const svg = $('#board'); svg.textContent = '';
+    const {items, groups} = aggregate();
+    const halfW = B.w / 2, halfH = B.h / 2;
+    const quads = [[1, B.x0 + halfW, B.y0], [2, B.x0 + halfW, B.y0 + halfH], [3, B.x0, B.y0], [4, B.x0, B.y0 + halfH]];
+    quads.forEach(([q, x, y]) => el('rect', {x, y, width: halfW, height: halfH, fill: cssv(SQ[q].v + '-soft')}, svg));
+    quads.forEach(([q, x, y]) => {
+      const right = q <= 2, top = q === 1 || q === 3, anchor = right ? 'end' : 'start';
+      const t = el('text', {x: right ? x + halfW - 16 : x + 16, y: top ? y + 30 : y + halfH - 16, 'text-anchor': anchor, class: 'qlabel', fill: cssv(SQ[q].v)}, svg);
+      t.textContent = 'Square ' + q + ': ' + SQ[q].name;
+      const nm = el('text', {x: right ? x + halfW - 18 : x + 18, y: top ? y + halfH - 14 : y + 78, 'text-anchor': anchor, class: 'qnum', fill: cssv(SQ[q].v)}, svg);
+      nm.textContent = q;
+    });
+    el('rect', {x: B.x0, y: B.y0, width: B.w, height: B.h, fill: 'none', stroke: cssv('--line'), 'stroke-width': 2, rx: 6}, svg);
+    el('line', {x1: B.x0 + halfW, y1: B.y0 - 8, x2: B.x0 + halfW, y2: B.y0 + B.h + 8, stroke: cssv('--muted'), 'stroke-width': 2}, svg);
+    el('line', {x1: B.x0 - 8, y1: B.y0 + halfH, x2: B.x0 + B.w + 8, y2: B.y0 + halfH, stroke: cssv('--muted'), 'stroke-width': 2}, svg);
+    const ax = (x, y, txt, cls, anchor, rot) => { const t = el('text', {x, y, class: cls, 'text-anchor': anchor || 'middle'}, svg); if (rot) t.setAttribute('transform', 'rotate(-90 ' + x + ' ' + y + ')'); t.textContent = txt; };
+    ax(B.x0, B.y0 + B.h + 34, '← Adds work', 'ax-strong', 'start');
+    ax(B.x0 + B.w, B.y0 + B.h + 34, 'Helps care →', 'ax-strong', 'end');
+    ax(B.x0 + halfW, B.y0 + B.h + 56, 'Does it help care or add work?', 'ax');
+    ax(B.x0 - 30, B.y0 + B.h, '← Often fails', 'ax-strong', 'start', true);
+    ax(B.x0 - 30, B.y0, 'Works well →', 'ax-strong', 'end', true);
+    ax(B.x0 - 62, B.y0 + halfH, 'Does it work well or often fail?', 'ax', 'middle', true);
+
+    if (!items.length){
+      const t = el('text', {x: B.x0 + halfW, y: B.y0 + halfH - 18, 'text-anchor': 'middle', class: 'ax-strong'}, svg);
+      t.textContent = 'Waiting for the first group…';
+      const t2 = el('text', {x: B.x0 + halfW, y: B.y0 + halfH + 12, 'text-anchor': 'middle', class: 'ax'}, svg);
+      t2.textContent = 'Press “Show QR” so each group can scan it with one phone';
+    }
+    if (dots){
+      Object.values(latest).forEach(m => m.items.forEach(i => {
+        if (hidden[keyOf(i.t)]) return;
+        el('circle', {cx: px(i.x), cy: py(i.y), r: 6, fill: cssv(SQ[squareOf(i.x, i.y)].v), opacity: .35}, svg);
+      }));
+    }
+    layout(items).forEach(p => {
+      const a = p.a, col = cssv(SQ[a.sq].v);
+      const g = el('g', {class: 'bub' + (seen[a.k] ? '' : ' new'), transform: 'translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ')'}, svg);
+      el('title', {}, g).textContent = a.name + ': placed by ' + a.n + ' group' + (a.n === 1 ? '' : 's');
+      el('circle', {class: 'main', r: p.r.toFixed(1), fill: col, opacity: .9, stroke: cssv('--panel'), 'stroke-width': 3}, g);
+      el('text', {class: 'bcount', 'text-anchor': 'middle', y: 5}, g).textContent = a.n;
+      el('text', {class: 'blabel', 'text-anchor': 'middle', y: (p.r + 18).toFixed(1)}, g).textContent = (a.worry ? '★ ' : '') + a.name;
+      seen[a.k] = true;
+    });
+    $('#stGroups').textContent = groups;
+    $('#stTech').textContent = items.length;
+    drawSide(items);
+  }
+
+  function drawSide(items){
+    const side = $('#side'); side.textContent = '';
+    const worries = items.filter(a => a.worry).sort((a, b) => b.worry - a.worry).slice(0, 4);
+    if (worries.length){
+      const w = document.createElement('div'); w.className = 'worry';
+      w.innerHTML = '<p class="eyebrow">Worries groups most</p><ol>' + worries.map(a => '<li>' + esc(a.name) + ' <em>· ' + a.worry + ' group' + (a.worry === 1 ? '' : 's') + '</em></li>').join('') + '</ol><p>Ask a group that starred it: what goes wrong, and what do nurses do to get around it?</p>';
+      side.appendChild(w);
+    }
+    [1, 2, 3, 4].forEach(q => {
+      const list = items.filter(a => a.sq === q).sort((a, b) => b.n - a.n);
+      const box = document.createElement('section'); box.className = 'sq ' + SQ[q].cls;
+      box.innerHTML = '<p class="sq-sub">Square ' + q + '</p><div class="sq-head"><b>' + SQ[q].name + '</b><span>' + list.length + '</span></div>';
+      if (!list.length){ const p = document.createElement('p'); p.className = 'empty-note'; p.textContent = 'Nothing here yet.'; box.appendChild(p); }
+      else {
+        const chips = document.createElement('div'); chips.className = 'chips';
+        list.forEach(a => {
+          const b = document.createElement('button'); b.type = 'button'; b.title = 'Click to hide from the board';
+          b.innerHTML = esc(a.name) + '<em>' + a.n + '</em>';
+          b.addEventListener('click', () => { hidden[a.k] = true; ls.set('sta-hidden-' + room, hidden); draw(); toast('Hidden “' + a.name + '”. Bring it back under More.'); });
+          chips.appendChild(b);
+        });
+        box.appendChild(chips);
+      }
+      side.appendChild(box);
+    });
+  }
+
+  /* ---- controls ---- */
+  let qrFor = '';
+  $('#qrBtn').addEventListener('click', () => {
+    const url = baseUrl() + '?room=' + room;
+    const isFile = location.protocol === 'file:';
+    $('#qrWarn').hidden = !isFile;
+    $('#qrCode').textContent = room;
+    $('#qrLink').textContent = baseUrl().replace(/^https?:\/\//, '');
+    if (qrFor !== url){
+      const box = $('#qrBox'); box.textContent = '';
+      if (window.QRCode){ new QRCode(box, {text: url, width: 400, height: 400, colorDark: '#132B27', colorLight: '#FFFFFF', correctLevel: QRCode.CorrectLevel.M}); qrFor = url; }
+      else box.textContent = 'QR code could not load. Students can open the link and type the code.';
+    }
+    $('#qr').hidden = false;
+  });
+  $('#qrClose').addEventListener('click', () => { $('#qr').hidden = true; });
+  $('#dotsBtn').setAttribute('aria-pressed', String(dots));
+  $('#dotsBtn').addEventListener('click', () => { dots = !dots; ls.set('sta-dots', dots); $('#dotsBtn').setAttribute('aria-pressed', String(dots)); draw(); });
+  $('#moreBtn').addEventListener('click', () => { $('#newRoomAsk').hidden = true; $('#newRoomRow').hidden = false; $('#more').hidden = false; });
+  $('#moreClose').addEventListener('click', () => { $('#more').hidden = true; });
+  $('#newRoomBtn').addEventListener('click', () => { $('#newRoomRow').hidden = true; $('#newRoomAsk').hidden = false; });
+  $('#newRoomNo').addEventListener('click', () => { $('#newRoomAsk').hidden = true; $('#newRoomRow').hidden = false; });
+  $('#newRoomYes').addEventListener('click', () => {
+    room = newCode(); ls.set('sta-screen-room', room); hidden = {}; latest = {}; seen = {}; demo = false; qrFor = '';
+    paintRoom(); connect(); draw(); $('#more').hidden = true; toast('New room ' + room + '. Show the QR again.');
+  });
+  $('#unhideBtn').addEventListener('click', () => { hidden = {}; ls.set('sta-hidden-' + room, hidden); draw(); toast('All items shown again.'); });
+  $('#demoBtn').addEventListener('click', () => {
+    demo = true; setStatus('demo', 'Sample data'); $('#connWarn').hidden = true;
+    const S = [
+      [1, [['Pulse oximeter',4.6,4.4,0],['Infusion pump',3.9,1.8,1],['Ward computer (EMR)',1.8,3.9,0],['Glucometer',4.7,4.6,0]]],
+      [2, [['Cardiac monitor',4.2,2.1,1],['Barcode scanner',2.1,1.4,0],['Digital thermometer',4.8,4.7,0],['Phone / WhatsApp',3.8,4.2,0]]],
+      [3, [['Infusion pump',3.6,1.5,0],['Printer',1.4,1.3,0],['Ward computer (EMR)',2.2,3.2,1],['BP machine',4.4,3.8,0]]],
+      [4, [['Barcode scanner',1.7,1.9,1],['Pulse oximeter',4.3,4.1,0],['Call bell',4.1,2.4,0],['Glucometer',4.5,3.6,0]]],
+      [5, [['Cardiac monitor',4.5,2.6,0],['Double documentation',1.3,4.4,1],['Electric bed',4.0,4.3,0]]],
+      [6, [['Infusion pump',4.1,2.2,1],['Barcode scanner',2.4,1.2,0],['Ward computer (EMR)',1.9,2.6,0],['Printer',1.8,1.6,0]]]
+    ];
+    S.forEach(([g, list], i) => { latest['demo' + i] = {g, ts: Date.now(), items: list.map(r => ({t:r[0], x:r[1], y:r[2], w:!!r[3]}))}; });
+    $('#more').hidden = true; draw(); toast('Sample data on this laptop only. Press “New room” before class.');
+  });
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+  $('#fsBtn').addEventListener('click', () => {
+    $('#more').hidden = true;
+    try {
+      if (fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      else { const d = document.documentElement, r = (d.requestFullscreen || d.webkitRequestFullscreen).call(d); if (r && r.catch) r.catch(() => toast('Press F11 for full screen.')); }
+    } catch(e){ toast('Press F11 for full screen.'); }
+  });
+  ['qr', 'more'].forEach(id => $('#' + id).addEventListener('click', e => { if (e.target.id === id) $('#' + id).hidden = true; }));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ $('#qr').hidden = true; $('#more').hidden = true; } });
+  if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+
+  paintRoom(); draw(); connect();
+}
+})();
+</script>
+</body>
+</html>
